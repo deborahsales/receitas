@@ -1,9 +1,9 @@
 {
-  "name": "receitas-para-a-rotina",
-  "version": "1.0.0",
+  "name": "okrardapio",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "Coleção de 40 receitas, cardápio semanal e lista de compras.",
+  "description": "OKRArdapio: 52 receitas, cardápio semanal e lista de compras.",
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "node scripts/build.mjs",

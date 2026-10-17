@@ -8,10 +8,10 @@ const byId = new Map(recipes.map(r => [r.id, r]));
 const entry = (recipeId, portions = 1) => ({ recipeId, portions });
 const itemFor = (result, prefix) => result.items.find(i => i.label.startsWith(prefix));
 
-test('catálogo completo: 40 IDs únicos e contagens por categoria', () => {
-  assert.equal(recipes.length, 40); assert.equal(byId.size, 40);
-  assert.deepEqual(recipes.map(r => r.id), Array.from({ length: 40 }, (_, i) => String(i + 1).padStart(2, '0')));
-  assert.deepEqual(CATEGORIES.map(c => recipes.filter(r => r.category === c.name).length), [7, 10, 10, 13]);
+test('catálogo completo: 52 IDs únicos e contagens por categoria', () => {
+  assert.equal(recipes.length, 52); assert.equal(byId.size, 52);
+  assert.deepEqual(recipes.map(r => r.id), Array.from({ length: 55 }, (_, i) => String(i + 1).padStart(2, '0')).filter(id => !['29', '48', '54'].includes(id)));
+  assert.deepEqual(CATEGORIES.map(c => recipes.filter(r => r.category === c.name).length), [6, 18, 15, 13]);
   assert.equal(recipes.filter(r => r.is_creami).length, 3);
   assert.equal(recipes.filter(r => r.has_gelatin).length, 2);
 });
@@ -24,8 +24,8 @@ test('cada receita tem ingredientes, instruções, porção, alérgenos e conser
   }
 });
 test('fotos, logo, fontes e PDFs existem no projeto', async () => {
-  const assets = ['assets/logo-quiabo.svg', 'assets/logo-quiabo.webp', 'assets/fonts/sans-regular.woff', 'assets/fonts/sans-bold.woff', 'assets/fonts/serif.woff', 'downloads/cards_receitas_A5.pdf', 'downloads/cards_receitas_A4_duplex.pdf', ...recipes.flatMap(r => [r.image, r.thumbnail])];
-  await Promise.all(assets.map(asset => access(new URL(`../src/${asset}`, import.meta.url))));
+  const assets = ['assets/okrardapio-compacta.svg', 'assets/okrardapio-compacta.webp', 'assets/okrardapio-horizontal.svg', 'assets/okrardapio-horizontal.webp', 'assets/fonts/sans-regular.woff', 'assets/fonts/sans-bold.woff', 'assets/fonts/serif.woff', 'downloads/cards_receitas_A5.pdf', 'downloads/cards_receitas_A4_duplex.pdf', ...recipes.flatMap(r => [r.image, r.thumbnail])];
+  await Promise.all(assets.map(async asset => assert.ok((await stat(new URL(`../src/${asset}`, import.meta.url))).size > 1000, `Arquivo vazio ou incompleto: ${asset}`)));
   for (const name of ['cards_receitas_A5.pdf', 'cards_receitas_A4_duplex.pdf']) assert.ok((await stat(new URL(`../src/downloads/${name}`, import.meta.url))).size > 1000000);
 });
 test('busca ignora acentos e encontra ingredientes', () => {
@@ -45,9 +45,30 @@ test('preparos que dependem de espera preservam o tempo completo no card', () =>
   const quick = filterRecipes(recipes, { maxTime: 10, ingredient: 'creami' });
   assert.equal(quick.length, 3); assert.ok(quick.every(r => r.time.includes('24 h')));
 });
-test('compatibilidade inclui alternativas de almoço, jantar e café', () => {
-  assert.ok(compatible(byId.get('07'), 'dinner')); assert.ok(compatible(byId.get('20'), 'breakfast'));
+test('compatibilidade respeita a reclassificação de almoço e jantar e alternativas de café', () => {
+  assert.equal(compatible(byId.get('07'), 'dinner'), false); assert.ok(compatible(byId.get('20'), 'breakfast'));
+  assert.ok(compatible(byId.get('04'), 'dinner')); assert.equal(compatible(byId.get('04'), 'breakfast'), false);
+  assert.ok(compatible(byId.get('13'), 'lunch')); assert.equal(compatible(byId.get('13'), 'dinner'), false);
+  assert.ok(compatible(byId.get('33'), 'dinner')); assert.ok(compatible(byId.get('55'), 'dinner'));
   assert.ok(compatible(byId.get('24'), 'snack')); assert.equal(compatible(byId.get('38'), 'lunch'), false);
+});
+test('catálogo ativo e sugestões excluem receitas removidas', () => {
+  assert.equal(JSON.stringify(recipes).toLowerCase().includes('lentilh'), false);
+  assert.equal(recipes.some(r => r.id === '54'), false);
+  const safe = sanitizeState({ favorites: ['29', '48', '54', '55'], plans: { '2026-10-12': { '0:dinner': entry('54'), '1:dinner': entry('55') } } }, recipes);
+  assert.deepEqual(safe.favorites, ['55']); assert.equal(safe.plans['2026-10-12']['0:dinner'], undefined);
+});
+test('duas porções do caldo de camarão usam um preparo completo', () => {
+  const result = shoppingList({ '0:dinner': entry('55'), '1:dinner': entry('55') }, recipes);
+  assert.equal(result.groups.length, 1); assert.equal(result.groups[0].multiplier, 1);
+  const shrimp = itemFor(result, 'Camarão'); assert.equal(shrimp.value, 320); assert.equal(shrimp.group, 'Proteínas');
+});
+test('novos jantares separam pesos crus e cozidos na compra', () => {
+  const result = shoppingList({ '0:dinner': entry('50'), '1:dinner': entry('53'), '2:dinner': entry('41') }, recipes);
+  assert.equal(itemFor(result, 'Carne bovina magra cozida').value, 180);
+  assert.equal(itemFor(result, 'Carne bovina magra crua').value, 300);
+  assert.equal(itemFor(result, 'Macaxeira cozida').value, 300);
+  assert.equal(itemFor(result, 'Frango cozido').value, 200);
 });
 test('datas locais: segunda-feira, domingo e virada de ano', () => {
   assert.equal(monday(parseDate('2027-01-01')), '2026-12-28');

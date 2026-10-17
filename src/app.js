@@ -125,14 +125,14 @@ function route() {
     renderCurrent(); window.scrollTo({ top: 0 });
     if (changed) main.focus({ preventScroll: true });
   }
-  document.title = `${({ receitas: 'Receitas para a rotina', favoritos: 'Minhas favoritas', cardapio: 'Meu cardápio', compras: 'Lista de compras' })[view]}${view === 'receitas' ? '' : ' · Receitas para a rotina'}`;
+  document.title = `${({ receitas: 'OKRArdapio', favoritos: 'Minhas favoritas', cardapio: 'Meu cardápio', compras: 'Lista de compras' })[view]}${view === 'receitas' ? '' : ' · OKRArdapio'}`;
 }
 function closeRecipe() {
   if (utilityDialog.open) closeUtility();
   if (recipeDialog.open) recipeDialog.close();
   currentRecipe = null;
   if (window.location.hash.startsWith('#receita/')) history.replaceState(null, '', returnRoute);
-  document.title = view === 'receitas' ? 'Receitas para a rotina' : `${({ favoritos: 'Minhas favoritas', cardapio: 'Meu cardápio', compras: 'Lista de compras' })[view]} · Receitas para a rotina`;
+  document.title = view === 'receitas' ? 'OKRArdapio' : `${({ favoritos: 'Minhas favoritas', cardapio: 'Meu cardápio', compras: 'Lista de compras' })[view]} · OKRArdapio`;
   if (lastFocus?.isConnected) lastFocus.focus({ preventScroll: true });
   else main.focus({ preventScroll: true });
 }
@@ -141,10 +141,10 @@ function hero() {
   return `<section class="hero container" aria-labelledby="hero-title">
     <div class="hero-copy"><div class="eyebrow">${icon('leaf')} Pequenas escolhas, bons sabores</div>
     <h1 id="hero-title">Uma boa refeição começa com <em>uma ideia.</em></h1>
-    <p>40 receitas para variar o que vai ao prato. Escolha seus sabores, organize a semana e leve só o que precisa para casa.</p>
+    <p>${recipes.length} receitas para variar o que vai ao prato. Escolha seus sabores, organize a semana e leve só o que precisa para casa.</p>
     <div class="hero-actions"><button class="button button-lime" data-action="explore">Explorar receitas ${icon('arrow')}</button><a href="#cardapio" class="button button-ghost">Montar meu cardápio ${icon('calendar')}</a></div>
     <div class="hero-note">${icon('check')} Do smoothie de 5 minutos ao preparo em lote.</div></div>
-    <div class="hero-visual"><img class="hero-food" src="assets/photos/07.webp" alt="Frango com limão e páprica acompanhado de batatas assadas" width="1200" height="800" fetchpriority="high"><a href="#receita/38" aria-label="Ver Creami de morango e iogurte"><img class="hero-round" src="assets/photos/38-small.webp" width="600" height="400" alt="Sorvete de morango e iogurte para a Ninja Creami"></a><div class="hero-stamp" aria-label="40 receitas"><strong>40</strong><span>receitas</span></div><a href="#receita/07" class="hero-photo-link"><span><small>Hoje pode ser assim</small><strong>Frango, limão e batatas douradas</strong></span>${icon('arrow')}</a></div>
+    <div class="hero-visual"><img class="hero-food" src="assets/photos/07.webp" alt="Frango com limão e páprica acompanhado de batatas assadas" width="1200" height="800" fetchpriority="high"><a href="#receita/38" aria-label="Ver Creami de morango e iogurte"><img class="hero-round" src="assets/photos/38-small.webp" width="600" height="400" alt="Sorvete de morango e iogurte para a Ninja Creami"></a><div class="hero-stamp" aria-label="${recipes.length} receitas"><strong>${recipes.length}</strong><span>receitas</span></div><a href="#receita/07" class="hero-photo-link"><span><small>Hoje pode ser assim</small><strong>Frango, limão e batatas douradas</strong></span>${icon('arrow')}</a></div>
   </section>`;
 }
 function categoryTabs() {
@@ -162,7 +162,7 @@ function catalogTools() {
 function renderCatalog() {
   const favorites = view === 'favoritos';
   main.innerHTML = `${favorites ? `<div class="container page-heading"><div class="eyebrow">${icon('heart')} Sua seleção</div><h1>Receitas para repetir.</h1><p>Guarde as que você gosta e encontre uma boa ideia sempre que precisar.</p></div>` : hero()}
-  <section class="collection container" id="collection" aria-labelledby="collection-title"><div class="section-heading"><h2 id="collection-title">${favorites ? 'Minhas favoritas' : 'O que vamos preparar?'}</h2><p>7 cafés · 10 almoços · 10 jantares · 13 lanches</p></div><div id="category-tabs">${categoryTabs()}</div>${catalogTools()}<div class="results-bar"><p id="result-count" role="status" aria-live="polite"></p><p class="waiting-note">Tempos de espera e congelamento aparecem em cada receita.</p></div><div id="catalog-results"></div>${!storageAvailable ? '<div class="storage-fallback">O navegador não permitiu salvar as escolhas. Use o botão “Salvar minhas escolhas” no rodapé antes de sair.</div>' : ''}</section>`;
+  <section class="collection container" id="collection" aria-labelledby="collection-title"><div class="section-heading"><h2 id="collection-title">${favorites ? 'Minhas favoritas' : 'O que vamos preparar?'}</h2><p>${CATEGORIES.map((c, i) => `${recipes.filter(r => r.category === c.name).length} ${['cafés', 'almoços', 'jantares', 'lanches'][i]}`).join(' · ')}</p></div><div id="category-tabs">${categoryTabs()}</div>${catalogTools()}<div class="results-bar"><p id="result-count" role="status" aria-live="polite"></p><p class="waiting-note">Tempos de espera e congelamento aparecem em cada receita.</p></div><div id="catalog-results"></div>${!storageAvailable ? '<div class="storage-fallback">O navegador não permitiu salvar as escolhas. Use o botão “Salvar minhas escolhas” no rodapé antes de sair.</div>' : ''}</section>`;
   renderCatalogResults();
 }
 function renderCatalogResults() {
@@ -198,7 +198,7 @@ function openRecipe(id) {
   <section class="detail-section storage-section" id="detail-storage"><h2>Prepare hoje. Aproveite depois.</h2><div class="storage-grid"><div class="storage-box"><h3>${icon('fridge')} Na geladeira</h3><p>${e(r.storage)}</p></div><div class="storage-box"><h3>${icon('snow')} Pode congelar?</h3><p>${e(r.freeze)}</p></div><div class="storage-box"><h3>${icon('portion')} Na hora de consumir</h3><p>${e(r.thaw)}</p></div></div></section><p class="allergen-note"><strong>Alérgenos:</strong> ${e(r.allergens)}</p><div class="detail-bottom-actions"><button class="button button-outline" data-action="guide">${icon('info')} Guia de preparo</button><button class="button" data-action="plan-recipe" data-id="${id}">${icon('calendar')} Colocar no cardápio</button></div></div>`;
   if (!recipeDialog.open) recipeDialog.showModal();
   recipeDialog.scrollTop = 0; favoriteButtons();
-  document.title = `${r.title} · Receitas para a rotina`;
+  document.title = `${r.title} · OKRArdapio`;
 }
 
 function weekNavigation() {
@@ -278,7 +278,7 @@ function openTemplates() {
 }
 function openDownloads() {
   utilityContext = { type: 'downloads' };
-  openUtility('Da tela para a sua cozinha.', 'Os 40 cards com ingredientes, preparo e conservação, em PDF de alta qualidade.', `<div class="utility-body"><a class="download-option" href="downloads/cards_receitas_A4_duplex.pdf" download>${icon('print')}<span><strong>Cards em folhas A4</strong><small>40 páginas · 2 cards por face · frente e verso</small><small>Imprima em 100%, virando pela borda longa.</small></span>${icon('download')}</a><a class="download-option" href="downloads/cards_receitas_A5.pdf" download>${icon('book')}<span><strong>Cards individuais em A5</strong><small>80 páginas · frente e verso de cada receita</small><small>A5 paisagem, 100%, virando pela borda curta.</small></span>${icon('download')}</a><p class="dialog-note">Os PDFs preservam textos e elementos vetoriais, com fotos independentes. São arquivos grandes: aguarde o download terminar. Você também pode imprimir uma receita pela janela de detalhes.</p></div>`);
+  openUtility('Da tela para a sua cozinha.', `Os ${recipes.length} cards com ingredientes, preparo e conservação, em PDF de alta qualidade.`, `<div class="utility-body"><a class="download-option" href="downloads/cards_receitas_A4_duplex.pdf" download>${icon('print')}<span><strong>Cards em folhas A4</strong><small>${2 * Math.ceil(recipes.length / 2)} páginas · 2 cards por face · frente e verso</small><small>Imprima em 100%, virando pela borda longa.</small></span>${icon('download')}</a><a class="download-option" href="downloads/cards_receitas_A5.pdf" download>${icon('book')}<span><strong>Cards individuais em A5</strong><small>${2 * recipes.length} páginas · frente e verso de cada receita</small><small>A5 paisagem, 100%, virando pela borda curta.</small></span>${icon('download')}</a><p class="dialog-note">Os PDFs preservam textos e elementos vetoriais, com fotos independentes. São arquivos grandes: aguarde o download terminar. Você também pode imprimir uma receita pela janela de detalhes.</p></div>`);
 }
 function openGuide() {
   utilityContext = { type: 'guide' };
@@ -342,7 +342,7 @@ async function restoreBackup(file) {
   finally { $('#restore-file').value = ''; }
 }
 function printHeader(label) {
-  return `<header class="print-header"><img src="assets/logo-quiabo.webp" width="110" height="43" alt="Quiabos"><small>${e(label)}</small></header>`;
+  return `<header class="print-header"><img src="assets/okrardapio-horizontal.webp" width="200" height="33" alt="OKRArdapio"><small>${e(label)}</small></header>`;
 }
 async function printContent(html) {
   $('#print-root').innerHTML = html;
@@ -491,7 +491,7 @@ async function init() {
   const response = await fetch('data/recipes.json');
   if (!response.ok) throw new Error('Falha ao carregar as receitas');
   recipes = await response.json();
-  if (!Array.isArray(recipes) || recipes.length !== 40) throw new Error('Catálogo incompleto');
+  if (!Array.isArray(recipes) || !recipes.length || new Set(recipes.map(r => r.id)).size !== recipes.length || recipes.some(r => !r.title || !r.ingredients?.length || !r.steps?.length)) throw new Error('Catálogo incompleto');
   byId = new Map(recipes.map(r => [r.id, r])); loadState(); route();
 }
 const ready = init().catch(error => {
