@@ -1,6 +1,6 @@
 # Receitas para a rotina
 
-Site interativo com as 40 receitas dos cards, a identidade em tons de verde e a logo de quiabos sem texto. O projeto está pronto para publicar como site estático na Vercel.
+Site interativo com as 40 receitas dos cards, a identidade em tons de verde e a logo de quiabos sem texto. A Vercel publica diretamente a pasta `src`, sem executar instalação ou script de build.
 
 ## O que está incluído
 
@@ -19,30 +19,32 @@ Não é preciso criar conta. As escolhas são salvas no armazenamento local do n
 ## Publicar na Vercel pelo GitHub
 
 1. Extraia o ZIP. A pasta `site_receitas_vercel` contém `package.json`, `vercel.json`, `src`, `scripts` e `tests`.
-2. Crie um repositório no GitHub e envie **o conteúdo dessa pasta** para a raiz do repositório. Inclua todos os arquivos de `src`, inclusive fotos, fontes e PDFs.
+2. Crie um repositório no GitHub e envie **o conteúdo dessa pasta** para a raiz do repositório. Inclua todos os arquivos de `src`, inclusive fotos, fontes e PDFs. Para enviar a pasta completa com os PDFs, prefira Git pelo terminal ou GitHub Desktop.
 3. Acesse [vercel.com/new](https://vercel.com/new), conecte sua conta do GitHub e importe o repositório.
 4. Se o painel pedir a configuração, use:
 
 | Campo | Valor |
 | --- | --- |
 | Framework Preset | Other |
-| Root Directory | A pasta que contém `package.json` |
-| Build Command | `npm run build` |
-| Output Directory | `dist` |
+| Root Directory | A pasta que contém `vercel.json` e `src` |
+| Build Command | Vazio, com Override ativado |
+| Install Command | Vazio, com Override ativado |
+| Output Directory | `src` |
 | Variáveis de ambiente | Nenhuma |
 
 5. Clique em **Deploy**. Quando a publicação terminar, abra o endereço fornecido pela Vercel.
 
-O arquivo `vercel.json` já declara o comando de build e a pasta de saída. Se o repositório tiver uma pasta externa `site_receitas_vercel`, selecione essa pasta em Root Directory.
+O arquivo `vercel.json` já desativa instalação e build e declara a pasta de saída `src`. Se o repositório tiver uma pasta externa `site_receitas_vercel`, selecione essa pasta em Root Directory. A raiz é a pasta que contém `src`; não selecione a própria pasta `src` como Root Directory.
 
 Se preferir usar o terminal, execute dentro do projeto:
 
 ```bash
-npm run build
 npx vercel --prod
 ```
 
 O comando da Vercel pedirá seu login e o projeto de destino. Ele publica no ambiente de produção quando você o executar. Este pacote não foi publicado automaticamente.
+
+Se você já tentou publicar a versão anterior, substitua o `vercel.json` da raiz pelo arquivo atualizado e faça um novo deploy. Na Vercel, confira **Settings → Build and Deployment**: remova qualquer comando antigo de build ou instalação e troque a saída de `dist` para `src`.
 
 Documentação oficial: [configuração de build](https://vercel.com/docs/builds/configure-a-build) e [Vercel CLI Deploy](https://vercel.com/docs/cli/deploy).
 
@@ -81,7 +83,15 @@ npm test
 npm run build
 ```
 
-O build recria a pasta `dist` a partir de `src`. Faça as edições em `src`. Na publicação pelo GitHub, um novo commit pode iniciar um novo deploy conforme a configuração do projeto na Vercel.
+O build local é opcional: ele recria `dist` a partir de `src`, mas a configuração atual da Vercel publica `src` diretamente. Faça as edições em `src`. Na publicação pelo GitHub, um novo commit pode iniciar um novo deploy conforme a configuração do projeto na Vercel.
+
+## Se aparecer MODULE_NOT_FOUND
+
+O final da pilha com `requireStack: []` não identifica sozinho o arquivo ausente. Procure a primeira linha `Error: Cannot find module '...'` e confira qual caminho foi usado. Os scripts `scripts/build.mjs` e `scripts/dev.mjs` estão incluídos no ZIP, ao lado de `package.json` na estrutura do projeto.
+
+No computador, extraia o ZIP inteiro e execute `npm run dev` na pasta que contém `package.json` e `scripts`. Não execute `node index.html`, `node src` ou comandos dentro do ZIP ainda compactado.
+
+Na Vercel, a configuração atual não executa esses scripts: Framework **Other**, Build Command e Install Command vazios e saída **src**. O arquivo `vercel.json` precisa estar na Root Directory selecionada. Se o erro continuar, envie a linha `Cannot find module ...` e o comando executado para identificar a causa exata.
 
 ## Como a lista de compras calcula
 
@@ -113,4 +123,4 @@ O build foi validado e os caminhos dos arquivos locais foram conferidos. Não ho
 
 ## Estrutura técnica
 
-HTML, CSS e JavaScript com módulos nativos. Build e servidor de desenvolvimento usam apenas módulos padrão do Node.js. Não há dependências de execução, chaves de API, autenticação nem etapa de configuração de banco de dados. Rotas de receitas usam hash, por exemplo `/#receita/07`, e funcionam no site estático.
+HTML, CSS e JavaScript com módulos nativos. A publicação na Vercel serve `src` diretamente. O build local opcional e o servidor de desenvolvimento usam apenas módulos padrão do Node.js. Não há dependências de execução, chaves de API, autenticação nem etapa de configuração de banco de dados. Rotas de receitas usam hash, por exemplo `/#receita/07`, e funcionam no site estático.

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#164B3A">
+  <meta name="description" content="40 receitas para variar a rotina. Explore por refeição, organize seu cardápio semanal e monte a lista de compras.">
+  <title>Receitas para a rotina</title>
+  <link rel="icon" href="assets/icon-192.png" type="image/png">
+  <link rel="preload" href="assets/fonts/sans-regular.woff" as="font" type="font/woff" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
+  <header class="site-header">
+    <div class="header-inner container">
+      <a class="brand" href="#receitas" aria-label="Início: receitas para a rotina"><img src="assets/logo-quiabo.webp" width="145" height="57" alt="Um quiabo inteiro apoiado em outro cortado longitudinalmente"></a>
+      <nav class="main-nav" aria-label="Navegação principal">
+        <a href="#receitas" data-nav="receitas"><span data-icon="book"></span><span>Receitas</span></a>
+        <a href="#favoritos" data-nav="favoritos"><span data-icon="heart"></span><span>Favoritos</span><span class="nav-count" id="favorites-count" hidden>0</span></a>
+        <a href="#cardapio" data-nav="cardapio"><span data-icon="calendar"></span><span>Meu cardápio</span></a>
+        <a href="#compras" data-nav="compras"><span data-icon="bag"></span><span>Lista de compras</span></a>
+      </nav>
+      <div class="header-actions"><button class="icon-button guide-button" data-action="guide" aria-label="Abrir guia de preparo e conservação" title="Guia de preparo"><span data-icon="info"></span></button><button class="button button-outline button-sm" data-action="downloads"><span data-icon="download"></span><span>Cards em PDF</span></button></div>
+    </div>
+  </header>
+  <main id="main-content" tabindex="-1">
+    <div class="loading-state container" id="initial-loading"><span class="loader" aria-hidden="true"></span><p>Preparando suas receitas…</p></div>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-grid"><div><img src="assets/logo-quiabo.webp" width="112" height="44" alt="" loading="lazy"><p>Mais variedade à mesa.<br>Mais leveza na rotina.</p></div><div><p>As fotos são ilustrativas e foram geradas por IA.<br>Siga as quantidades e as porções escritas nas receitas.</p><p class="muted">Favoritos e cardápios ficam salvos neste navegador.</p></div><div class="footer-links"><button data-action="guide">Guia de preparo</button><button data-action="downloads">Baixar os cards</button><button data-action="backup">Salvar minhas escolhas</button><button data-action="restore">Restaurar minhas escolhas</button></div></div>
+    <div class="container footer-bottom"><span>40 receitas para todos os dias.</span><span>Porções culinárias como ponto de partida; ajuste à sua fome e rotina.</span></div>
+  </footer>
+  <nav class="mobile-nav" aria-label="Navegação no celular">
+    <a href="#receitas" data-nav="receitas"><span data-icon="book"></span><span>Receitas</span></a>
+    <a href="#favoritos" data-nav="favoritos"><span data-icon="heart"></span><span>Favoritos</span></a>
+    <a href="#cardapio" data-nav="cardapio"><span data-icon="calendar"></span><span>Cardápio</span></a>
+    <a href="#compras" data-nav="compras"><span data-icon="bag"></span><span>Compras</span></a>
+  </nav>
+  <dialog id="recipe-dialog" class="recipe-dialog" aria-labelledby="recipe-title"><div id="recipe-content"></div></dialog>
+  <dialog id="utility-dialog" class="utility-dialog" aria-labelledby="utility-title"><div id="utility-content"></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="print-root"></div>
+  <input type="file" id="restore-file" accept="application/json,.json" hidden>
+  <noscript><div class="container noscript"><h1>Receitas para a rotina</h1><p>Ative o JavaScript para explorar as receitas e montar seu cardápio.</p><a href="downloads/cards_receitas_A4_duplex.pdf" download>Baixar os 40 cards em PDF A4</a></div></noscript>
+</body>
+</html>
